@@ -10,9 +10,13 @@ namespace SearchAvia.Controllers
     {
         public ActionResult Index()
         {
-            var t = new SearchAviasales();
-            t.Start();
-            return View();
+            var vm = new SearchVM();
+            return View(vm);
+        }
+
+        public JsonResult Search()
+        {
+            return Json("test");
         }
     }
 }
