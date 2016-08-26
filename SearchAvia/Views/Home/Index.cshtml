@@ -7,7 +7,7 @@
     var opt = new AjaxOptions();
     opt.OnSuccess = "UpdateResult";
 }
-@using (Ajax.BeginForm("Search", "Home", opt, new { @class = "form-inline" } ))
+@using (Ajax.BeginForm("Search", "Home", opt, new { @class = "form-inline" }))
 {
     <div class="row">
         <div class="col-md-3 col-sm-6">@Html.TextBoxFor(x => x.CityFrom, new { @class = "form-control", placeholder = "откуда" })</div>

@@ -23,9 +23,9 @@ namespace SearchAvia
         public override SearchResult Load()
         {
             var url = GetUrlLoad();
-            //var html = LoadContent(url);
+            var html = LoadContent(url);
             //File.WriteAllText(@"C:\temp\2\1.html", html);
-            var html = File.ReadAllText(@"C:\temp\2\1.html");
+            //var html = File.ReadAllText(@"C:\temp\2\1.html");
             var res = Parse(html);
             res.Url = url;
             return res;
