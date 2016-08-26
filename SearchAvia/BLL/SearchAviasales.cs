@@ -50,9 +50,8 @@ namespace SearchAvia
 
         private string LoadContent(string url)
         {
-            var loader = new HelperAwesomium();
-            loader.Load(url, CheckLoading);
-            return loader.GetHtml();
+            var html = HelperAwesomium.Instance.Load(url, CheckLoading);
+            return html;
         }
 
         private bool CheckLoading(string html)

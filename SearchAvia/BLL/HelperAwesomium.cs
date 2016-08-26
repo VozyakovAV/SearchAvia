@@ -9,91 +9,147 @@ using System.IO;
 
 namespace SearchAvia
 {
-    public class HelperAwesomium
+    public class HelperAwesomium : IDisposable
     {
         private WebView _browser;
-        public bool IsLoading { get; protected set; }
+
+        private static HelperAwesomium _instance;
+        public static HelperAwesomium Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new HelperAwesomium();
+                return _instance;
+            }
+        }
 
         public HelperAwesomium()
         {
-            
-        }
-
-        Func<string, bool> _checkLoading;
-
-        public void Load(string url, Func<string, bool> checkLoading)
-        {
-            this._url = url;
-            this._checkLoading = checkLoading;
-            //var th = new Thread(LoadThread);
-            //th.Start();
-            LoadThread();
-        }
-
-        private string _url;
-        private void LoadThread()
-        {
-            IsLoading = true;
             Init();
-            _browser = CreateBrowser();
-            _browser.WebSession.ClearCookies();
-            _browser.Source = new Uri(_url);
-            while (IsLoading)
+        }
+
+        public string Load(string url, Func<string, bool> checkLoading)
+        {
+            string html = null;
+            bool isLoaded = false;
+            CreateBrowser();
+            SetUrl(url);
+            while (!isLoaded)
             {
-                WebCore.Update();
-                Thread.Sleep(500);
-                var b = _checkLoading.Invoke(GetHtml());
-                if (b)
-                    IsLoading = false;
-                if (_browser.HTML.Length > 0)
-                {
-                    //var t = _browser.ExecuteJavascriptWithResult("document.querySelector('a');");
-                }
+                Wait();
+                html = GetHtml();
+                isLoaded = checkLoading.Invoke(html);
             }
 
-            var t = _browser.ExecuteJavascriptWithResult("document.querySelector('.ticket-new__opener');");
+            while (!isLoaded)
+                Thread.Sleep(100);
+            return html;
         }
 
-        public void Stop()
+        private string GetHtml()
         {
-            IsLoading = false;
-        }
-
-        public string GetHtml()
-        {
-            if (_browser == null || _browser.IsLoading)
-                return "";
+            string html = null;
+            _context.Post(state =>
+            {
+                if (_browser == null || _browser.IsLoading)
+                html = "";
             else
             {
-                var html = _browser.ExecuteJavascriptWithResult("document.body.innerHTML");
-                return html.ToString();
+                var t = _browser.ExecuteJavascriptWithResult("document.body.innerHTML");
+                html = t == null ? "" : t.ToString();
             }
+            }, null);
+            while (html == null)
+                Thread.Sleep(100);
+            return html;
         }
 
-        private static object _lock = new object();
+
+        SynchronizationContext _context = null;
         private void Init()
         {
-            lock (_lock)
+            _context = null;
+            Thread awesomiumThread = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
             {
-                if (!WebCore.IsInitialized)
-                {
-                    WebConfig.Default.UserAgent = "Chrome";
-                    WebCore.Initialize(WebConfig.Default);
-                }
-            }
+                WebCore.Started += (s, e) => {
+                    _context = SynchronizationContext.Current;
+                };
+
+                WebCore.Run();
+            }));
+
+            awesomiumThread.Start();
+
+            WebConfig.Default.UserAgent = "Chrome";
+            WebCore.Initialize(WebConfig.Default);
+
+            while (_context == null)
+                Thread.Sleep(100);
         }
 
-        public void Test2()
+
+
+        private void CreateBrowser()
+        {
+            _browser = null;
+            _context.Post(state =>
+            {
+                _browser = WebCore.CreateWebView(1100, 600);
+            }, null);
+            while (_browser == null)
+                Thread.Sleep(100);
+        }
+
+        private void SetUrl(string url)
+        {
+            bool b = false;
+            _context.Post(state =>
+            {
+                _browser.Source = new Uri(url);
+                b = true;
+            }, null);
+            while (!b)
+                Thread.Sleep(100);
+        }
+
+        private void Wait()
+        {
+            bool b = false;
+            _context.Post(state =>
+            {
+                WebCore.Update();
+                Thread.Sleep(100);
+                b = true;
+            }, null);
+
+            while (!b)
+                Thread.Sleep(100);
+        }
+
+        public void Dispose()
+        {
+            /*if (_browser != null)
+            {
+                _browser.Dispose();
+            }*/
+
+            /*context.Post(state =>
+            {
+                _browser.Source = new Uri("http://www.google.com");
+            }, null);
+            context.Send(state =>
+             {
+                 _browser.Source = new Uri("http://www.google.com");
+             }, null);*/
+        }
+
+        /*
+          public void Test2()
         {
             JSObject btn = _browser.ExecuteJavascriptWithResult("document.getElementsByTagName('a')[0]");
-        }
-
-        private static WebView CreateBrowser()
-        {
-            var p = WebPreferences.Default;
-            
-            WebSession session = WebCore.CreateWebSession(p);
-            return WebCore.CreateWebView(1100, 600, session);
-        }
+            var t = _browser.ExecuteJavascriptWithResult("document.querySelector('.ticket-new__opener');");
+        }/*/
     }
 }
+ 

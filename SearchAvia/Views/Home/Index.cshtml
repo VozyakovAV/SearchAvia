@@ -17,30 +17,44 @@
     </div>
     <br />
     <div class="text-center"><input type="submit" value="Поиск" class="btn btn-primary" /></div>
-        
 }
 
 <br />
 
-<div id="result">
-</div>
+<div id="status"></div>
+<div id="result"></div>
 
 <script type="text/javascript">
-    function UpdateResult(responce) {
-        $("#result").empty();
+    function UpdateResult(response) {
+        var result = $("#result");
+        var status = $("#status");
+        result.empty();
+        status.empty();
 
-        if (responce.result) {
-            var data = responce.result;
+        if (response.IsSearching) {
+            status.append("Идет поиск. ");
+            setTimeout(GetStatus, 500);
+        }
+        if (response.Message) {
+            status.append(response.Message);
+        }
+        if (response.Result) {
+            var data = response.Result;
             var s = [];
             s.push("<div>Цена: " + data.Price + "</div>");
             s.push("<div>Авиакомпания: " + data.Airline + "</div>");
             s.push("<div>Отправление: " + data.Date + "</div>");
             s.push("<div>Обратно: " + data.DateBack + "</div>");
             s.push("<div><a href=" + data.Url + " target='_blank'>Постмотреть страницу</a></div>");
-            $("#result").append(s.join(""));
+            result.append(s.join(""));
         }
-        else {
-            $("#result").html(responce.msg);
-        }
+    }
+    function GetStatus() {
+        var url = "@Url.Action("GetStatusSearch", "Home")";
+        $.ajax({ type: "POST", url: url,
+            success: function (response) {
+                UpdateResult(response)
+            }
+        });
     }
 </script>
