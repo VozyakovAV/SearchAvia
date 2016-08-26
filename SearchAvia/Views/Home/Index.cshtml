@@ -20,12 +20,23 @@
     <hr />
 
     <div id="result">
-
     </div>
 </div>
 
 <script type="text/javascript">
     function UpdateResult(responce) {
-        $("#result").html(responce);
+        $("#result").empty();
+
+        if (responce.result) {
+            var data = responce.result;
+            var s = [];
+            s.push("<div>Авиакомпания: " + data.Airline + "</div>");
+            s.push("<div>Отправление: " + data.Date + "</div>");
+            s.push("<div>Обратно: " + data.DateBack + "</div>");
+            $("#result").append(s.join(""));
+        }
+        else {
+            $("#result").html(responce.msg);
+        }
     }
 </script>

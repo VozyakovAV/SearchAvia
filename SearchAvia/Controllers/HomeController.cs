@@ -14,9 +14,26 @@ namespace SearchAvia.Controllers
             return View(vm);
         }
 
-        public JsonResult Search()
+        [HttpPost]
+        public JsonResult Search(SearchVM search)
         {
-            return Json("test");
+            SearchResult res = null;
+            string msg = null;
+
+            try
+            {
+                var s = new SearchAviasales(search.CityFrom, search.CityTo, search.Date, search.DateBack);
+                res = s.Load();
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+
+            return Json(new {
+                result = res,
+                msg
+            });
         }
     }
 }

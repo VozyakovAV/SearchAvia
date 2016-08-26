@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace SearchAvia
 {
@@ -15,51 +16,49 @@ namespace SearchAvia
 
     public class SearchAviasales : SearchBase
     {
-        public override bool IsSearching
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
+        public SearchAviasales(string cityFrom, string cityTo, DateTime date, DateTime dateBack) 
+            : base(cityFrom, cityTo, date, dateBack)
+        { }
 
-            protected set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public override string GetResult()
+        public override SearchResult Load()
         {
-            throw new NotImplementedException();
-        }
-
-        public override void Start()
-        {
-            var html = LoadContent();
+            var url = GetUrlLoad();
+            //var html = LoadContent(url);
             //File.WriteAllText(@"C:\temp\2\1.html", html);
-            //var html = File.ReadAllText(@"C:\temp\2\1.html");
-            Parse(html);
+            var html = File.ReadAllText(@"C:\temp\2\1.html");
+            var res = Parse(html);
+            return res;
         }
 
-        private string LoadContent()
+        private string GetUrlLoad()
         {
-            var url = "https://search.aviasales.ru/MOW2708PAR19091";
+            //https://search.aviasales.ru/MOW2708PAR19091
+            var sb = new StringBuilder("https://search.aviasales.ru/");
+            sb.Append(CityFrom);
+            sb.Append(Date.Day.ToString().PadLeft(2, '0'));
+            sb.Append(Date.Month.ToString().PadLeft(2, '0'));
+            sb.Append(CityTo);
+            if (DateBack.HasValue)
+            {
+                sb.Append(DateBack.Value.Day.ToString().PadLeft(2, '0'));
+                sb.Append(DateBack.Value.Month.ToString().PadLeft(2, '0'));
+            }
+            return sb.ToString();
+        }
+
+        private string LoadContent(string url)
+        {
             var loader = new HelperAwesomium();
             loader.Load(url, CheckLoading);
-            loader.Test2();
-            //loader.JsFireEvent("document.getElementsByTagName('a')[0]", "click");
-            //ticket-new__opener
             return loader.GetHtml();
         }
 
         private bool CheckLoading(string html)
         {
-            if (html.Length > 0)
-                File.WriteAllText(@"C:\temp\2\2.html", html);
             return html.Contains("ticket-new");
         }
 
-        private void Parse(string html)
+        private SearchResult Parse(string html)
         {
             var node = HtmlParsingHelper.ToHtmlNode(html);
             var ticketsNodes = node.CssSelect("#results_add_container .ticket-new__container");
@@ -75,10 +74,10 @@ namespace SearchAvia
                 ParseDates(ticketNode, out date, out dateBack);
                 res.Date = date;
                 res.DateBack = dateBack;
-                
 
+                return res;
             }
-
+            return null;
         }
 
         private string ParseAirline(HtmlNode node)
@@ -92,7 +91,7 @@ namespace SearchAvia
         private void ParseDates(HtmlNode node, out DateTime date, out DateTime dateBack)
         {
             date = Date;
-            dateBack = DateBack;
+            dateBack = DateBack.GetValueOrDefault();
 
             var nodes = node.CssSelect(".fly-segment__common-info").ToList();
             if (nodes.Count() > 0)

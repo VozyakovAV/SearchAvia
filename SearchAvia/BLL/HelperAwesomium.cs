@@ -38,7 +38,6 @@ namespace SearchAvia
             _browser = CreateBrowser();
             _browser.WebSession.ClearCookies();
             _browser.Source = new Uri(_url);
-            _browser.DocumentReady += _browser_DocumentReady;
             while (IsLoading)
             {
                 WebCore.Update();
@@ -53,11 +52,6 @@ namespace SearchAvia
             }
 
             var t = _browser.ExecuteJavascriptWithResult("document.querySelector('.ticket-new__opener');");
-        }
-
-        private void _browser_DocumentReady(object sender, DocumentReadyEventArgs e)
-        {
-            //File.WriteAllText(@"C:\temp\2\3.html", (sender as WebView).HTML);
         }
 
         public void Stop()

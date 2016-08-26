@@ -10,11 +10,17 @@ namespace SearchAvia
         public string CityFrom { get; set; }
         public string CityTo { get; set; }
         public DateTime Date { get; set; }
-        public DateTime DateBack { get; set; }
+        public DateTime? DateBack { get; set; }
 
-        public abstract bool IsSearching { get; protected set; }
-        public abstract void Start();
-        public abstract string GetResult();
+        public abstract SearchResult Load();
+
+        public SearchBase(string cityFrom, string cityTo, DateTime date, DateTime dateBack)
+        {
+            this.CityFrom = cityFrom;
+            this.CityTo = cityTo;
+            this.Date = date;
+            this.DateBack = dateBack;
+        }
     }
 
     public class SearchResult
