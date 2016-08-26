@@ -17,13 +17,14 @@ namespace SearchAvia.Controllers
         [HttpPost]
         public JsonResult Search(SearchVM search)
         {
-            SearchResult res = null;
+            SearchResultVM res = null;
             string msg = null;
 
             try
             {
                 var s = new SearchAviasales(search.CityFrom, search.CityTo, search.Date, search.DateBack);
-                res = s.Load();
+                var result = s.Load();
+                res = new SearchResultVM(result);
             }
             catch (Exception ex)
             {

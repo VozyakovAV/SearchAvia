@@ -30,9 +30,11 @@
         if (responce.result) {
             var data = responce.result;
             var s = [];
+            s.push("<div>Цена: " + data.Price + "</div>");
             s.push("<div>Авиакомпания: " + data.Airline + "</div>");
             s.push("<div>Отправление: " + data.Date + "</div>");
             s.push("<div>Обратно: " + data.DateBack + "</div>");
+            s.push("<div><a href=" + data.Url + " target='_blank'>Постмотреть страницу</a></div>");
             $("#result").append(s.join(""));
         }
         else {

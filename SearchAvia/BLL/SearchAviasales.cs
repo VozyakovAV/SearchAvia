@@ -27,6 +27,7 @@ namespace SearchAvia
             //File.WriteAllText(@"C:\temp\2\1.html", html);
             var html = File.ReadAllText(@"C:\temp\2\1.html");
             var res = Parse(html);
+            res.Url = url;
             return res;
         }
 
@@ -43,6 +44,7 @@ namespace SearchAvia
                 sb.Append(DateBack.Value.Day.ToString().PadLeft(2, '0'));
                 sb.Append(DateBack.Value.Month.ToString().PadLeft(2, '0'));
             }
+            sb.Append("1");
             return sb.ToString();
         }
 
@@ -69,6 +71,7 @@ namespace SearchAvia
                 var res = new SearchResult();
 
                 res.Airline = ParseAirline(ticketNode);
+                res.Price = ParsePrice(ticketNode);
 
                 DateTime date, dateBack;
                 ParseDates(ticketNode, out date, out dateBack);
@@ -86,6 +89,19 @@ namespace SearchAvia
             if (img != null && img.Attributes.Contains("title"))
                 return img.Attributes["title"].Value;
             return string.Empty;
+        }
+
+        private double ParsePrice(HtmlNode node)
+        {
+            var price = node.CssSelect(".ticket-new__buy-price-num").FirstOrDefault();
+            if (price != null)
+            {
+                var st = price.InnerText.Replace(char.ConvertFromUtf32(8201), "");
+                var mc = Regex.Match(st, "\\d+");
+                if (mc.Success)
+                    return int.Parse(mc.Value);
+            }
+            return 0;
         }
 
         private void ParseDates(HtmlNode node, out DateTime date, out DateTime dateBack)

@@ -26,8 +26,10 @@ namespace SearchAvia
     public class SearchResult
     {
         public string Airline { get; set; }
+        public double Price { get; set; }
         public string[] Flights { get; set; }
         public DateTime Date { get; set; }
         public DateTime DateBack { get; set; }
+        public string Url { get; set; }
     }
 }
