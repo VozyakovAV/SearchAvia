@@ -2,25 +2,27 @@
 @{
     ViewBag.Title = "Search";
 }
-<br /><br />
-<div class="container">
-    @{
-        var opt = new AjaxOptions();
-        opt.OnSuccess = "UpdateResult";
-    }
-    @using (Ajax.BeginForm("Search", "Home", opt, new { @class = "form-inline" } ))
-    {
-        @Html.TextBoxFor(x => x.CityFrom, new { @class = "form-control", placeholder = "откуда" })
-        @Html.TextBoxFor(x => x.CityTo, new { @class = "form-control", placeholder = "куда" })
-        @Html.TextBoxFor(x => x.Date, new { @class = "form-control", placeholder = "когда?", type = "date", @Value = Model.Date.ToString("yyyy-MM-dd") })
-        @Html.TextBoxFor(x => x.DateBack, new { @class = "form-control", placeholder = "когда обратно?", type = "date", @Value = Model.DateBack.ToString("yyyy-MM-dd") })
-        <input type="submit" value="Поиск" />
-    }
 
-    <hr />
-
-    <div id="result">
+@{
+    var opt = new AjaxOptions();
+    opt.OnSuccess = "UpdateResult";
+}
+@using (Ajax.BeginForm("Search", "Home", opt, new { @class = "form-inline" } ))
+{
+    <div class="row">
+        <div class="col-md-3 col-sm-6">@Html.TextBoxFor(x => x.CityFrom, new { @class = "form-control", placeholder = "откуда" })</div>
+        <div class="col-md-3 col-sm-6">@Html.TextBoxFor(x => x.CityTo, new { @class = "form-control", placeholder = "куда" })</div>
+        <div class="col-md-3 col-sm-6">@Html.TextBoxFor(x => x.Date, new { @class = "form-control", placeholder = "когда?", type = "date", @Value = Model.Date.ToString("yyyy-MM-dd") })</div>
+        <div class="col-md-3 col-sm-6">@Html.TextBoxFor(x => x.DateBack, new { @class = "form-control", placeholder = "когда обратно?", type = "date", @Value = Model.DateBack.ToString("yyyy-MM-dd") })</div>
     </div>
+    <br />
+    <div class="text-center"><input type="submit" value="Поиск" class="btn btn-primary" /></div>
+        
+}
+
+<br />
+
+<div id="result">
 </div>
 
 <script type="text/javascript">
