@@ -18,8 +18,8 @@ namespace SearchAvia
         {
             this.Airline = result.Airline;
             this.Price = result.Price.ToString();
-            this.Date = result.Date.ToString("dd.MM.yyyy HH:mm");
-            this.DateBack = result.DateBack.ToString("dd.MM.yyyy HH:mm");
+            this.Date = result.Date;
+            this.DateBack = result.DateBack;
             this.Url = result.Url;
         }
     }

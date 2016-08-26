@@ -39,11 +39,8 @@ namespace SearchAvia
             sb.Append(Date.Day.ToString().PadLeft(2, '0'));
             sb.Append(Date.Month.ToString().PadLeft(2, '0'));
             sb.Append(CityTo);
-            if (DateBack.HasValue)
-            {
-                sb.Append(DateBack.Value.Day.ToString().PadLeft(2, '0'));
-                sb.Append(DateBack.Value.Month.ToString().PadLeft(2, '0'));
-            }
+            sb.Append(DateBack.Day.ToString().PadLeft(2, '0'));
+            sb.Append(DateBack.Month.ToString().PadLeft(2, '0'));
             sb.Append("1");
             return sb.ToString();
         }
@@ -71,11 +68,8 @@ namespace SearchAvia
 
                 res.Airline = ParseAirline(ticketNode);
                 res.Price = ParsePrice(ticketNode);
-
-                DateTime date, dateBack;
-                ParseDates(ticketNode, out date, out dateBack);
-                res.Date = date;
-                res.DateBack = dateBack;
+                res.Date = ParseDate(ticketNode);
+                res.DateBack = ParseDateBack(ticketNode);
 
                 return res;
             }
@@ -103,34 +97,29 @@ namespace SearchAvia
             return 0;
         }
 
-        private void ParseDates(HtmlNode node, out DateTime date, out DateTime dateBack)
+        private string ParseDate(HtmlNode node)
         {
-            date = Date;
-            dateBack = DateBack.GetValueOrDefault();
-
-            var nodes = node.CssSelect(".fly-segment__common-info").ToList();
-            if (nodes.Count() > 0)
-            {
-                var nodeTime = nodes[0].CssSelect(".fly-segment__time").FirstOrDefault();
-                date = ParseDate(nodeTime, date);
-            }
-            if (nodes.Count() > 1)
-            {
-                var nodeTime = nodes[1].CssSelect(".fly-segment__time").FirstOrDefault();
-                dateBack = ParseDate(nodeTime, dateBack);
-            }
+            return ParseDate(node, ".fly-segment__origin", 0);
         }
 
-        private DateTime ParseDate(HtmlNode node, DateTime currentDate)
+        private string ParseDateBack(HtmlNode node)
         {
-            var mc = Regex.Match(node.InnerText, "(?<h>\\d{1,2}):(?<m>\\d{1,2})");
-            if (mc.Success)
+            return ParseDate(node, ".fly-segment__destination", 1);
+        }
+
+        private string ParseDate(HtmlNode node, string selector, int number)
+        {
+            var nodes = node.CssSelect(".fly-segment__common-info").ToList();
+            if (nodes.Count() > number)
             {
-                var h = int.Parse(mc.Groups["h"].Value);
-                var m = int.Parse(mc.Groups["m"].Value);
-                return new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, h, m, 0);
+                var nodeDate = nodes[number].CssSelect(selector + " .fly-segment__date").FirstOrDefault();
+                var nodeTime = nodes[number].CssSelect(selector + " .fly-segment__time").FirstOrDefault();
+                var dateSt = nodeDate == null ? "" : nodeDate.InnerText;
+                var timeSt = nodeTime == null ? "" : nodeTime.InnerText;
+                var date = dateSt + ", " + timeSt;
+                return date;
             }
-            return currentDate;
+            return string.Empty;
         }
     }
 }
