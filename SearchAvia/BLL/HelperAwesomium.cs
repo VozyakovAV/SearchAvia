@@ -6,6 +6,7 @@ using Awesomium.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace SearchAvia
 {
@@ -31,11 +32,12 @@ namespace SearchAvia
 
         public string Load(string url, Func<string, bool> checkLoading)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             string html = null;
             bool isLoaded = false;
             CreateBrowser();
             SetUrl(url);
-            while (!isLoaded)
+            while (!isLoaded && sw.Elapsed.TotalSeconds < 120)
             {
                 Wait();
                 html = GetHtml();
@@ -47,7 +49,7 @@ namespace SearchAvia
             return html;
         }
 
-        private string GetHtml()
+        public string GetHtml()
         {
             string html = null;
             _context.Post(state =>
@@ -127,12 +129,18 @@ namespace SearchAvia
                 Thread.Sleep(100);
         }
 
-        /*
-          public void Test2()
+        public void OnClick(string selector)
         {
-            JSObject btn = _browser.ExecuteJavascriptWithResult("document.getElementsByTagName('a')[0]");
-            var t = _browser.ExecuteJavascriptWithResult("document.querySelector('.ticket-new__opener');");
-        }/*/
+            bool b = false;
+            _context.Post(state =>
+            {
+                _browser.ExecuteJavascript("function AddClickMethod(element, event) {var e = document.createEvent('HTMLEvents'); e.initEvent(event, true, false); element.dispatchEvent(e); } AddClickMethod(document.querySelector('" + selector + "'), 'click');");
+                b = true;
+            }, null);
+
+            while (!b)
+                Thread.Sleep(100);
+        }
     }
 }
  

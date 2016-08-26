@@ -44,8 +44,13 @@
             var s = [];
             s.push("<div>Цена: " + data.Price + "</div>");
             s.push("<div>Авиакомпания: " + data.Airline + "</div>");
+            s.push("<br />");
             s.push("<div>Отправление: " + data.Date + "</div>");
+            s.push("<div>Рейсы: " + data.Flights + "</div>");
+            s.push("<br />");
             s.push("<div>Обратно: " + data.DateBack + "</div>");
+            s.push("<div>Рейсы обратно: " + data.FlightsBack + "</div>");
+            s.push("<br />");
             s.push("<div><a href=" + data.Url + " target='_blank'>Постмотреть страницу</a></div>");
             result.append(s.join(""));
         }

@@ -23,9 +23,9 @@ namespace SearchAvia
         public override SearchResult Load()
         {
             var url = GetUrlLoad();
-            var html = LoadContent(url);
+            //var html = LoadContent(url);
             //File.WriteAllText(@"C:\temp\2\1.html", html);
-            //var html = File.ReadAllText(@"C:\temp\2\1.html");
+            var html = File.ReadAllText(@"C:\temp\2\1.html");
             var res = Parse(html);
             res.Url = url;
             return res;
@@ -48,6 +48,9 @@ namespace SearchAvia
         private string LoadContent(string url)
         {
             var html = HelperAwesomium.Instance.Load(url, CheckLoading);
+            HelperAwesomium.Instance.OnClick(".ticket-new__opener");
+            Thread.Sleep(1000);
+            html = HelperAwesomium.Instance.GetHtml();
             return html;
         }
 
@@ -70,7 +73,8 @@ namespace SearchAvia
                 res.Price = ParsePrice(ticketNode);
                 res.Date = ParseDate(ticketNode);
                 res.DateBack = ParseDateBack(ticketNode);
-
+                res.Flights = ParseFlights(ticketNode, 0);
+                res.FlightsBack = ParseFlights(ticketNode, 1);
                 return res;
             }
             return null;
@@ -120,6 +124,20 @@ namespace SearchAvia
                 return date;
             }
             return string.Empty;
+        }
+
+        private string[] ParseFlights(HtmlNode node, int number)
+        {
+            var list = new List<string>();
+            var nodesTop = node.CssSelect(".ticket-new__segment").ToList();
+            if (nodesTop.Count > number)
+            {
+                var nodes = nodesTop[number].CssSelect(".fly-segment__footer-info");
+                foreach (var n in nodes)
+                    list.Add(n.InnerText.Replace("Рейс:", "").Trim());
+            }
+
+            return list.ToArray();
         }
     }
 }

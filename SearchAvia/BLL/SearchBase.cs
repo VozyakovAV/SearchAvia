@@ -27,9 +27,10 @@ namespace SearchAvia
     {
         public string Airline { get; set; }
         public double Price { get; set; }
-        public string[] Flights { get; set; }
         public string Date { get; set; }
         public string DateBack { get; set; }
         public string Url { get; set; }
+        public string[] Flights { get; set; }
+        public string[] FlightsBack { get; set; }
     }
 }
