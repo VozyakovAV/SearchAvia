@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Awesomium.Core;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SearchAvia
 {
@@ -14,18 +15,34 @@ namespace SearchAvia
 
         public HelperAwesomium()
         {
-            _browser = WebCore.CreateWebView(1100, 600);
+            
         }
 
-        public void Load(string url)
+        Func<string, bool> _checkLoading;
+
+        public void Load(string url, Func<string, bool> checkLoading)
+        {
+            this._url = url;
+            this._checkLoading = checkLoading;
+            //var th = new Thread(LoadThread);
+            //th.Start();
+            LoadThread();
+        }
+
+        private string _url;
+        private void LoadThread()
         {
             IsLoading = true;
             Init();
-            _browser.Source = new Uri(url);
+            _browser = WebCore.CreateWebView(1100, 600);
+            _browser.Source = new Uri(_url);
             while (IsLoading)
             {
                 WebCore.Update();
-                Thread.Sleep(200);
+                Thread.Sleep(100);
+                var b = _checkLoading.Invoke(_browser.HTML);
+                if (b)
+                    IsLoading = false;
             }
         }
 

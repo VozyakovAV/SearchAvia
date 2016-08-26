@@ -10,6 +10,8 @@ namespace SearchAvia.Controllers
     {
         public ActionResult Index()
         {
+            var t = new SearchAviasales();
+            t.Start();
             return View();
         }
     }
