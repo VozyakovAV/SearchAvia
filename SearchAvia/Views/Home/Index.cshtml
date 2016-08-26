@@ -26,14 +26,15 @@
 
 <script type="text/javascript">
     function UpdateResult(response) {
+        console.log(response);
         var result = $("#result");
         var status = $("#status");
         result.empty();
         status.empty();
 
         if (response.IsSearching) {
-            status.append("Идет поиск. ");
-            setTimeout(GetStatus, 500);
+            status.append("Идет поиск... ");
+            setTimeout(GetStatus, 2000);
         }
         if (response.Message) {
             status.append(response.Message);

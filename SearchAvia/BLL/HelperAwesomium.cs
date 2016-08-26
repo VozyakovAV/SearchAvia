@@ -9,7 +9,7 @@ using System.IO;
 
 namespace SearchAvia
 {
-    public class HelperAwesomium : IDisposable
+    public class HelperAwesomium
     {
         private WebView _browser;
 
@@ -125,23 +125,6 @@ namespace SearchAvia
 
             while (!b)
                 Thread.Sleep(100);
-        }
-
-        public void Dispose()
-        {
-            /*if (_browser != null)
-            {
-                _browser.Dispose();
-            }*/
-
-            /*context.Post(state =>
-            {
-                _browser.Source = new Uri("http://www.google.com");
-            }, null);
-            context.Send(state =>
-             {
-                 _browser.Source = new Uri("http://www.google.com");
-             }, null);*/
         }
 
         /*

@@ -56,7 +56,7 @@ namespace SearchAvia
 
         private bool CheckLoading(string html)
         {
-            return html.Contains("ticket-new");
+            return html.Length > 0 && !html.Contains("countdown__time") && html.Contains("ticket-new");
         }
 
         private SearchResult Parse(string html)
